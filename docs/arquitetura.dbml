@@ -1,0 +1,150 @@
+// =====================================================================
+// Global Solution 2026-2 - Citizen Intelligence & Predictive Analytics
+// Modelagem relacional dos dados processados (data/processed/)
+// =====================================================================
+// O projeto não usa banco de dados nem ORM: as "tabelas" abaixo são os
+// parquets/CSVs produzidos por src/preprocessing.py e src/features.py.
+// A chave de integração entre as fontes é o tempo, truncado na hora
+// (horário local America/Sao_Paulo, sem horário de verão no período).
+//
+// Fontes brutas (data/raw/):
+//   INMET automaticas_processed.parquet  -> clima_horario (estação A701)
+//   Infosiga sinistros_2022-2024.csv     -> sinistro (município de São Paulo)
+//   CET lentidao*.csv                    -> lentidao_horaria (agregado por hora)
+// =====================================================================
+
+Project mobilidade_sp {
+  database_type: 'Parquet / Pandas'
+  Note: 'Impacto de clima e tempo na severidade de sinistros e na lentidão em São Paulo (2022-2023).'
+}
+
+// ---------------------------------------------------------------------
+// Tabela horária: grade completa de 17.520 horas (2022-01-01 a 2023-12-31)
+// Arquivo: data/processed/mobilidade_sp_horario.parquet
+// Grão: 1 linha por hora. Base da regressão de lentidão.
+// ---------------------------------------------------------------------
+Table mobilidade_horaria {
+  datetime timestamp [pk, note: 'Início da hora, horário local']
+  // ---- Clima (INMET A701, registro da hora seguinte via merge_asof) ----
+  precipitacao_mm float [note: 'Chuva acumulada na hora (mm)']
+  precipitacao_3h_mm float [note: 'Chuva acumulada nas últimas 3 h (mm)']
+  temperatura_c float [note: 'Temperatura do ar (°C)']
+  ponto_orvalho_c float [note: 'Ponto de orvalho (°C)']
+  umidade_pct float [note: 'Umidade relativa (%)']
+  pressao_mb float [note: 'Pressão atmosférica na estação (mB)']
+  vento_m_s float [note: 'Velocidade do vento (m/s)']
+  rajada_m_s float [note: 'Rajada máxima (m/s)']
+  direcao_vento_deg float [note: 'Direção do vento (graus)']
+  radiacao_kj_m2 float [note: 'Radiação global (kJ/m²), >= 0']
+  clima_disponivel boolean [note: 'True se precipitação, temperatura e umidade existem']
+  clima_imputado boolean [note: 'True se algum valor foi interpolado/preenchido']
+  defasagem_clima_min float [note: 'Minutos entre a hora de referência e o registro INMET usado (0 ou 60)']
+  // ---- Lentidão (CET, média dos instantâneos de 30 min) ----
+  km_lentidao_total float [note: 'Extensão média de lentidão na cidade (km)']
+  km_lentidao_centro float [note: 'Lentidão na região CENTRO (km)']
+  km_lentidao_leste float
+  km_lentidao_norte float
+  km_lentidao_oeste float
+  km_lentidao_sul float
+  n_trechos_lentidao float [note: 'Nº médio de trechos em lentidão']
+  lentidao_disponivel boolean [note: 'False em dias sem coleta da CET (NaN nos km)']
+  // ---- Sinistros agregados ----
+  n_sinistros integer [note: 'Sinistros registrados na hora']
+  n_sinistros_com_vitima integer
+  n_vitimas integer [note: 'Soma de vítimas fatais, graves e leves']
+
+  Note: 'Grade horária completa; clima e lentidão podem ser nulos (flags *_disponivel).'
+}
+
+// ---------------------------------------------------------------------
+// Tabela de sinistros: 90.682 ocorrências de São Paulo com clima e
+// lentidão da hora anexados.
+// Arquivo: data/processed/mobilidade_sp_consolidado.parquet
+// Grão: 1 linha por sinistro. Base da classificação de severidade e dos KPIs.
+// ---------------------------------------------------------------------
+Table sinistro {
+  id_sinistro integer [pk, note: 'Identificador do Infosiga']
+  datetime timestamp [not null, note: 'Data e hora do sinistro (local)']
+  datetime_hora timestamp [not null, ref: > mobilidade_horaria.datetime, note: 'Hora truncada usada no merge']
+  tipo_registro varchar [note: 'NOTIFICACAO | SINISTRO NAO FATAL | SINISTRO FATAL']
+  severidade varchar [note: 'SEM_VITIMA | COM_VITIMA | FATAL (derivada de tipo_registro)']
+  com_vitima integer [not null, note: 'Alvo da classificação: 1 se houve vítima']
+  dia_da_semana varchar
+  turno varchar [note: 'MADRUGADA | MANHA | TARDE | NOITE | NAO DISPONIVEL']
+  logradouro varchar
+  tipo_via varchar [note: 'VIAS URBANAS | ESTRADAS E RODOVIAS | NAO DISPONIVEL']
+  categoria_via varchar [note: 'Derivada do prefixo do logradouro (AVENIDA, RUA, RODOVIA, MARGINAL, ...)']
+  zona varchar [note: 'CENTRO | NORTE | SUL | LESTE | OESTE | NAO DISPONIVEL (derivada de lat/long)']
+  administracao varchar [note: 'PREFEITURA | DER | CONCESSIONÁRIA | ...']
+  latitude float
+  longitude float
+  tp_sinistro_primario varchar [note: 'COLISAO | ATROPELAMENTO | CHOQUE | OUTROS | NAO DISPONIVEL']
+  qtd_pedestre integer
+  qtd_bicicleta integer
+  qtd_motocicleta integer
+  qtd_automovel integer
+  qtd_onibus integer
+  qtd_caminhao integer
+  qtd_veic_outros integer
+  qtd_veic_nao_disponivel integer
+  qtd_veiculos integer [note: 'Soma das colunas qtd_* de veículos']
+  qtd_gravidade_fatal integer
+  qtd_gravidade_grave integer
+  qtd_gravidade_leve integer
+  qtd_gravidade_ileso integer
+  qtd_gravidade_nao_disponivel integer
+  qtd_vitimas integer [note: 'fatal + grave + leve']
+  // ---- Clima e lentidão copiados da hora (desnormalizado p/ análise) ----
+  precipitacao_mm float
+  precipitacao_3h_mm float
+  temperatura_c float
+  umidade_pct float
+  vento_m_s float
+  pressao_mb float
+  clima_disponivel boolean
+  km_lentidao_total float [note: 'Lentidão na hora do sinistro (km)']
+  km_lentidao_h1 float [note: 'Lentidão na hora seguinte (km)']
+  lentidao_disponivel boolean
+
+  indexes {
+    datetime
+    (categoria_via, tipo_via)
+  }
+}
+
+// ---------------------------------------------------------------------
+// Tabelas de KPI (geradas por src/features.py)
+// ---------------------------------------------------------------------
+Table kpi_isr {
+  categoria_via varchar [pk, ref: > sinistro.categoria_via]
+  faixa_chuva varchar [pk, note: 'SEM_CHUVA | FRACA (<=2,5 mm/h) | MODERADA (<=10) | FORTE (>10)']
+  total_sinistros integer
+  com_vitima integer
+  isr float [note: 'Índice de Severidade Relativa = com_vitima / total_sinistros']
+  isr_geral float [note: 'ISR de toda a base, para comparação']
+  isr_relativo float [note: 'isr / isr_geral']
+  Note: 'Arquivo data/processed/kpi_isr.csv. Apenas combinações com >= 30 sinistros.'
+}
+
+Table kpi_frt {
+  categoria varchar [pk, note: 'tp_sinistro_primario ou severidade, conforme o arquivo']
+  total_sinistros integer
+  frt_km_hora float [note: 'Média de km de lentidão na hora do sinistro']
+  frt_km_hora_seguinte float [note: 'Média de km de lentidão na hora seguinte']
+  frt_km_medio float [note: 'Fator de Retenção de Tráfego: média das duas horas']
+  lentidao_tipica_km float [note: 'Mediana de lentidão para o mesmo dia da semana e hora']
+  excedente_km float [note: 'frt_km_medio - lentidao_tipica_km']
+  excedente_pct float
+  Note: 'Arquivos data/processed/kpi_frt_tipo_sinistro.csv e kpi_frt_severidade.csv.'
+}
+
+Table kpi_taxa_sinistros_clima {
+  faixa_chuva varchar [pk]
+  horas integer [note: 'Horas observadas na faixa']
+  sinistros integer
+  com_vitima integer
+  sinistros_por_hora float
+  sinistros_com_vitima_por_hora float
+  isr float
+  Note: 'Arquivo data/processed/kpi_taxa_sinistros_clima.csv.'
+}

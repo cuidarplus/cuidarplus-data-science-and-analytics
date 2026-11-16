@@ -1,0 +1,14 @@
+# Tema fixo do dashboard: independe do modo claro/escuro do sistema operacional.
+[theme]
+base = "light"
+primaryColor = "#2f5597"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f3f4f6"
+textColor = "#1f2937"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true

@@ -1,0 +1,266 @@
+{
+  "classificacao": {
+    "nome": "XGBClassifier",
+    "alvo": "com_vitima",
+    "features": [
+      "hora",
+      "dia_semana_num",
+      "mes",
+      "fim_de_semana",
+      "feriado",
+      "hora_pico",
+      "precipitacao_mm",
+      "precipitacao_3h_mm",
+      "temperatura_c",
+      "umidade_pct",
+      "vento_m_s",
+      "pressao_mb",
+      "tipo_via",
+      "categoria_via",
+      "zona"
+    ],
+    "n_treino": 70076,
+    "n_teste": 17519,
+    "metricas_cv": {
+      "f1": {
+        "media": 0.6543755039839401,
+        "desvio": 0.0059802181000579374
+      },
+      "f1_macro": {
+        "media": 0.5619152361080559,
+        "desvio": 0.00533632884066344
+      },
+      "roc_auc": {
+        "media": 0.5980703958537547,
+        "desvio": 0.005736935310448458
+      },
+      "balanced_accuracy": {
+        "media": 0.5685052208695114,
+        "desvio": 0.005165609363936476
+      }
+    },
+    "metricas_teste": {
+      "f1": 0.6571199773894202,
+      "f1_macro": 0.5649999915913717,
+      "precision": 0.7049014653865588,
+      "recall": 0.6154049761778719,
+      "accuracy": 0.584508248187682,
+      "balanced_accuracy": 0.5716475163831962,
+      "roc_auc": 0.5988260189364485,
+      "matriz_confusao": [
+        [
+          3265,
+          2920
+        ],
+        [
+          4359,
+          6975
+        ]
+      ]
+    },
+    "metricas_temporal": {
+      "treino_ano": 2022,
+      "teste_ano": 2023,
+      "n_teste": 43329,
+      "f1": 0.6570961023504909,
+      "f1_macro": 0.548151481623515,
+      "precision": 0.6926182915833627,
+      "recall": 0.6250397990589733,
+      "accuracy": 0.5744189803595744,
+      "balanced_accuracy": 0.5522291014946972,
+      "roc_auc": 0.5763548178877409,
+      "matriz_confusao": [
+        [
+          7221,
+          7841
+        ],
+        [
+          10599,
+          17668
+        ]
+      ]
+    },
+    "baseline_teste": {
+      "f1": 0.6364997343893369,
+      "f1_macro": 0.5556373488777331,
+      "precision": 0.7030833244425477,
+      "recall": 0.5814363860949356,
+      "accuracy": 0.5703521890518866,
+      "balanced_accuracy": 0.5657384032334015,
+      "roc_auc": 0.5910114208413343,
+      "matriz_confusao": [
+        [
+          3402,
+          2783
+        ],
+        [
+          4744,
+          6590
+        ]
+      ]
+    },
+    "importancia_features": {
+      "tipo_via_NAO DISPONIVEL": 0.17049036920070648,
+      "zona_NAO DISPONIVEL": 0.06904348731040955,
+      "categoria_via_RUA": 0.06287245452404022,
+      "categoria_via_NAO DISPONIVEL": 0.05660068988800049,
+      "tipo_via_VIAS URBANAS": 0.056589119136333466,
+      "fim_de_semana": 0.04290883243083954,
+      "zona_LESTE": 0.04127213731408119,
+      "categoria_via_RODOVIA": 0.03666062280535698,
+      "hora_pico": 0.03375515341758728,
+      "zona_CENTRO": 0.03137971833348274,
+      "dia_semana_num": 0.02957659773528576,
+      "hora": 0.029570383951067924,
+      "zona_NORTE": 0.02844870835542679,
+      "mes": 0.025751153007149696,
+      "tipo_via_ESTRADAS E RODOVIAS": 0.02499537542462349,
+      "feriado": 0.02199403941631317,
+      "categoria_via_ACESSO": 0.02106412500143051,
+      "categoria_via_AVENIDA": 0.020550165325403214,
+      "zona_SUL": 0.020105836912989616,
+      "categoria_via_OUTROS": 0.017569852992892265,
+      "zona_OESTE": 0.01717115379869938,
+      "categoria_via_ESTRADA": 0.016498040407896042,
+      "pressao_mb": 0.015237869694828987,
+      "categoria_via_PONTE_VIADUTO_TUNEL": 0.015188682824373245,
+      "temperatura_c": 0.014816248789429665,
+      "vento_m_s": 0.014104715548455715,
+      "umidade_pct": 0.013778997585177422,
+      "precipitacao_mm": 0.013635269366204739,
+      "precipitacao_3h_mm": 0.013268804177641869,
+      "categoria_via_MARGINAL": 0.012613063678145409,
+      "categoria_via_PRACA_LARGO": 0.01248831395059824
+    },
+    "scale_pos_weight": 0.5457031939297688
+  },
+  "regressao": {
+    "nome": "XGBRegressor",
+    "alvo": "km_lentidao_total",
+    "features": [
+      "hora",
+      "dia_semana_num",
+      "mes",
+      "fim_de_semana",
+      "feriado",
+      "hora_pico",
+      "precipitacao_mm",
+      "precipitacao_3h_mm",
+      "temperatura_c",
+      "umidade_pct",
+      "vento_m_s",
+      "pressao_mb"
+    ],
+    "n_treino": 12466,
+    "n_teste": 3117,
+    "metricas_cv": {
+      "rmse": {
+        "media": 10.127386584441837,
+        "desvio": 0.502438793836883
+      },
+      "mae": {
+        "media": 5.998660908605558,
+        "desvio": 0.16989197923384913
+      },
+      "r2": {
+        "media": 0.7146609241655478,
+        "desvio": 0.019865197131066766
+      }
+    },
+    "metricas_teste": {
+      "rmse": 9.611223756571288,
+      "mae": 5.774029240817351,
+      "r2": 0.734384027757788,
+      "media_alvo": 13.62756705165223
+    },
+    "metricas_temporal": {
+      "treino_ano": 2022,
+      "teste_ano": 2023,
+      "n_teste": 7447,
+      "rmse": 12.54637457869903,
+      "mae": 7.53681220897767,
+      "r2": 0.5038723761439593,
+      "media_alvo": 14.352947428494696
+    },
+    "baseline_teste": {
+      "rmse": 14.010085516268617,
+      "mae": 9.391791274357013,
+      "r2": 0.4356112048765949,
+      "media_alvo": 13.62756705165223
+    },
+    "importancia_features": {
+      "hora_pico": 0.42221036553382874,
+      "fim_de_semana": 0.19342927634716034,
+      "feriado": 0.12029503285884857,
+      "hora": 0.10011184215545654,
+      "dia_semana_num": 0.04483731463551521,
+      "mes": 0.03994164615869522,
+      "temperatura_c": 0.01641690358519554,
+      "precipitacao_3h_mm": 0.014799503609538078,
+      "umidade_pct": 0.013844865374267101,
+      "pressao_mb": 0.012942581437528133,
+      "vento_m_s": 0.011659364216029644,
+      "precipitacao_mm": 0.009511214680969715
+    },
+    "scale_pos_weight": 1.0
+  },
+  "categorias_via": {
+    "tipo_via": [
+      "ESTRADAS E RODOVIAS",
+      "NAO DISPONIVEL",
+      "VIAS URBANAS"
+    ],
+    "categoria_via": [
+      "ACESSO",
+      "AVENIDA",
+      "ESTRADA",
+      "MARGINAL",
+      "NAO DISPONIVEL",
+      "OUTROS",
+      "PONTE_VIADUTO_TUNEL",
+      "PRACA_LARGO",
+      "RODOVIA",
+      "RUA"
+    ],
+    "zona": [
+      "CENTRO",
+      "LESTE",
+      "NAO DISPONIVEL",
+      "NORTE",
+      "OESTE",
+      "SUL"
+    ]
+  },
+  "faixas_numericas": {
+    "precipitacao_mm": {
+      "min": 0.0,
+      "max": 44.8,
+      "mediana": 0.0
+    },
+    "precipitacao_3h_mm": {
+      "min": 0.0,
+      "max": 61.800000000000004,
+      "mediana": 0.0
+    },
+    "temperatura_c": {
+      "min": 7.2,
+      "max": 37.2,
+      "mediana": 20.3
+    },
+    "umidade_pct": {
+      "min": 17.0,
+      "max": 99.0,
+      "mediana": 74.0
+    },
+    "vento_m_s": {
+      "min": 0.0,
+      "max": 8.4,
+      "mediana": 1.7
+    },
+    "pressao_mb": {
+      "min": 914.2,
+      "max": 939.5,
+      "mediana": 926.7
+    }
+  }
+}
