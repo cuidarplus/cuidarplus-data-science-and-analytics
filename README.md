@@ -7,7 +7,7 @@ com dados é via Pandas e arquivos locais.
 
 ## Dashboard online
 
-**Acesse o painel publicado:** [INSERIR_LINK_DO_SITE_AQUI]
+**Acesse o painel publicado:** [https://cuidarplus-data-science-and-analytics-gs-jose-e-danilo.streamlit.app/]
 
 O mesmo dashboard pode ser executado localmente com `make run-app` (ver
 [Como executar](#como-executar)).
