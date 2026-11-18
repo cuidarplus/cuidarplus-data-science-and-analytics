@@ -1,31 +1,10 @@
-// =====================================================================
-// Global Solution 2026-2 - Citizen Intelligence & Predictive Analytics
-// Modelagem relacional dos dados processados (data/processed/)
-// =====================================================================
-// O projeto não usa banco de dados nem ORM: as "tabelas" abaixo são os
-// parquets/CSVs produzidos por src/preprocessing.py e src/features.py.
-// A chave de integração entre as fontes é o tempo, truncado na hora
-// (horário local America/Sao_Paulo, sem horário de verão no período).
-//
-// Fontes brutas (data/raw/):
-//   INMET automaticas_processed.parquet  -> clima_horario (estação A701)
-//   Infosiga sinistros_2022-2024.csv     -> sinistro (município de São Paulo)
-//   CET lentidao*.csv                    -> lentidao_horaria (agregado por hora)
-// =====================================================================
-
 Project mobilidade_sp {
   database_type: 'Parquet / Pandas'
   Note: 'Impacto de clima e tempo na severidade de sinistros e na lentidão em São Paulo (2022-2023).'
 }
 
-// ---------------------------------------------------------------------
-// Tabela horária: grade completa de 17.520 horas (2022-01-01 a 2023-12-31)
-// Arquivo: data/processed/mobilidade_sp_horario.parquet
-// Grão: 1 linha por hora. Base da regressão de lentidão.
-// ---------------------------------------------------------------------
 Table mobilidade_horaria {
   datetime timestamp [pk, note: 'Início da hora, horário local']
-  // ---- Clima (INMET A701, registro da hora seguinte via merge_asof) ----
   precipitacao_mm float [note: 'Chuva acumulada na hora (mm)']
   precipitacao_3h_mm float [note: 'Chuva acumulada nas últimas 3 h (mm)']
   temperatura_c float [note: 'Temperatura do ar (°C)']
@@ -39,7 +18,6 @@ Table mobilidade_horaria {
   clima_disponivel boolean [note: 'True se precipitação, temperatura e umidade existem']
   clima_imputado boolean [note: 'True se algum valor foi interpolado/preenchido']
   defasagem_clima_min float [note: 'Minutos entre a hora de referência e o registro INMET usado (0 ou 60)']
-  // ---- Lentidão (CET, média dos instantâneos de 30 min) ----
   km_lentidao_total float [note: 'Extensão média de lentidão na cidade (km)']
   km_lentidao_centro float [note: 'Lentidão na região CENTRO (km)']
   km_lentidao_leste float
@@ -48,7 +26,6 @@ Table mobilidade_horaria {
   km_lentidao_sul float
   n_trechos_lentidao float [note: 'Nº médio de trechos em lentidão']
   lentidao_disponivel boolean [note: 'False em dias sem coleta da CET (NaN nos km)']
-  // ---- Sinistros agregados ----
   n_sinistros integer [note: 'Sinistros registrados na hora']
   n_sinistros_com_vitima integer
   n_vitimas integer [note: 'Soma de vítimas fatais, graves e leves']
@@ -56,12 +33,6 @@ Table mobilidade_horaria {
   Note: 'Grade horária completa; clima e lentidão podem ser nulos (flags *_disponivel).'
 }
 
-// ---------------------------------------------------------------------
-// Tabela de sinistros: 90.682 ocorrências de São Paulo com clima e
-// lentidão da hora anexados.
-// Arquivo: data/processed/mobilidade_sp_consolidado.parquet
-// Grão: 1 linha por sinistro. Base da classificação de severidade e dos KPIs.
-// ---------------------------------------------------------------------
 Table sinistro {
   id_sinistro integer [pk, note: 'Identificador do Infosiga']
   datetime timestamp [not null, note: 'Data e hora do sinistro (local)']
@@ -94,7 +65,6 @@ Table sinistro {
   qtd_gravidade_ileso integer
   qtd_gravidade_nao_disponivel integer
   qtd_vitimas integer [note: 'fatal + grave + leve']
-  // ---- Clima e lentidão copiados da hora (desnormalizado p/ análise) ----
   precipitacao_mm float
   precipitacao_3h_mm float
   temperatura_c float
@@ -112,9 +82,6 @@ Table sinistro {
   }
 }
 
-// ---------------------------------------------------------------------
-// Tabelas de KPI (geradas por src/features.py)
-// ---------------------------------------------------------------------
 Table kpi_isr {
   categoria_via varchar [pk, ref: > sinistro.categoria_via]
   faixa_chuva varchar [pk, note: 'SEM_CHUVA | FRACA (<=2,5 mm/h) | MODERADA (<=10) | FORTE (>10)']
