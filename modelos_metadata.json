@@ -99,6 +99,28 @@
         ]
       ]
     },
+    "baseline_temporal": {
+      "treino_ano": 2022,
+      "teste_ano": 2023,
+      "n_teste": 43329,
+      "f1": 0.6475909314560387,
+      "f1_macro": 0.5484524328441774,
+      "precision": 0.696236012207528,
+      "recall": 0.6052994658081863,
+      "accuracy": 0.5702185603175702,
+      "balanced_accuracy": 0.5548406770018226,
+      "roc_auc": 0.5780957805389872,
+      "matriz_confusao": [
+        [
+          7597,
+          7465
+        ],
+        [
+          11157,
+          17110
+        ]
+      ]
+    },
     "importancia_features": {
       "tipo_via_NAO DISPONIVEL": 0.17049036920070648,
       "zona_NAO DISPONIVEL": 0.06904348731040955,
@@ -187,6 +209,15 @@
       "mae": 9.391791274357013,
       "r2": 0.4356112048765949,
       "media_alvo": 13.62756705165223
+    },
+    "baseline_temporal": {
+      "treino_ano": 2022,
+      "teste_ano": 2023,
+      "n_teste": 7447,
+      "rmse": 13.52842701648156,
+      "mae": 9.262997776363479,
+      "r2": 0.4231651166935285,
+      "media_alvo": 14.352947428494696
     },
     "importancia_features": {
       "hora_pico": 0.42221036553382874,

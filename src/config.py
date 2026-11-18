@@ -30,6 +30,7 @@ RAW_LENTIDAO_CSVS: Final[tuple[Path, ...]] = (
 # Saídas da etapa de pré-processamento
 CONSOLIDADO_PARQUET: Final[Path] = PROCESSED_DIR / "mobilidade_sp_consolidado.parquet"
 HORARIO_PARQUET: Final[Path] = PROCESSED_DIR / "mobilidade_sp_horario.parquet"
+RASTREABILIDADE_CSV: Final[Path] = PROCESSED_DIR / "rastreabilidade.csv"
 
 # Saídas da etapa de modelagem (modelos ``.pkl`` na raiz, conforme especificação)
 MODELO_CLASSIFICACAO_PKL: Final[Path] = PROJECT_ROOT / "modelo_classificacao_severidade.pkl"

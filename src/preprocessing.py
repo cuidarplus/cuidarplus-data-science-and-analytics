@@ -40,6 +40,7 @@ from src.config import (
     PROCESSED_DIR,
     RAW_CLIMA_PARQUET,
     RAW_LENTIDAO_CSVS,
+    RASTREABILIDADE_CSV,
     RAW_SINISTROS_CSV,
 )
 
@@ -543,6 +544,70 @@ def construir_base_consolidada(sinistros: pd.DataFrame, base_horaria: pd.DataFra
     return consolidado.reset_index(drop=True)
 
 
+def resumir_rastreabilidade(
+    caminho_clima: Path = RAW_CLIMA_PARQUET,
+    caminho_sinistros: Path = RAW_SINISTROS_CSV,
+    caminhos_lentidao: Iterable[Path] = RAW_LENTIDAO_CSVS,
+    estacao: str = ESTACAO_INMET,
+    municipio: str = MUNICIPIO_ALVO,
+    inicio: str = PERIODO_INICIO,
+    fim: str = PERIODO_FIM,
+) -> pd.DataFrame:
+    linhas: list[tuple[str, str, int, str]] = []
+
+    sin = pd.read_csv(
+        caminho_sinistros, sep=";", encoding="latin-1", usecols=["municipio", "data_sinistro", "hora_sinistro"],
+        dtype={"hora_sinistro": "string"}, low_memory=False,
+    )
+    linhas.append(("Infosiga", "Registros brutos (todos os municípios, 2022-2024)", len(sin), "sinistros"))
+    sin = sin[sin["municipio"] == municipio]
+    linhas.append(("Infosiga", f"Município de {municipio}", len(sin), "sinistros"))
+    sin = sin[sin["hora_sinistro"].str.match(r"^\d{2}:\d{2}$", na=False)]
+    linhas.append(("Infosiga", "Com hora válida (HH:MM)", len(sin), "sinistros"))
+    momento = pd.to_datetime(sin["data_sinistro"] + " " + sin["hora_sinistro"], format="%d/%m/%Y %H:%M", errors="coerce").dropna()
+    linhas.append(("Infosiga", "Com data e hora interpretáveis", len(momento), "sinistros"))
+    linhas.append(("Infosiga", "No período 2022-2023 (base final)", int(((momento >= inicio) & (momento <= fim)).sum()), "sinistros"))
+
+    dataset = ds.dataset(caminho_clima)
+    linhas.append(("INMET", "Observações brutas (todas as estações automáticas)", dataset.count_rows(), "observações"))
+    datas = dataset.to_table(filter=pc.field("station_code") == estacao, columns=["datetime"]).to_pandas()["datetime"]
+    linhas.append(("INMET", f"Estação {estacao}", len(datas), "observações"))
+    datas = pd.to_datetime(datas, utc=True).dt.tz_convert(FUSO_LOCAL).dt.tz_localize(None)
+    datas = datas[(datas >= inicio) & (datas <= fim)]
+    linhas.append(("INMET", "No período, após conversão UTC para horário local", len(datas), "observações"))
+    linhas.append(("INMET", "Sem carimbos duplicados", int(datas.nunique()), "horas"))
+    grade = pd.date_range(inicio, fim, freq="h")
+    linhas.append(("INMET", "Horas da grade horária completa", len(grade), "horas"))
+    linhas.append(("INMET", "Horas ausentes na fonte", len(grade) - int(datas.nunique()), "horas"))
+    clima = carregar_clima(caminho_clima, estacao, inicio, fim)
+    linhas.append(("INMET", "Horas ainda sem registro após imputar lacunas curtas", len(grade) - len(clima), "horas"))
+    linhas.append(("INMET", "Horas com ao menos uma variável imputada", int(clima["clima_imputado"].sum()), "horas"))
+
+    bruto = pd.concat(
+        [pd.read_csv(c, sep=";", encoding="latin-1", usecols=["data", "tamanho"]) for c in caminhos_lentidao], ignore_index=True
+    )
+    linhas.append(("CET", "Registros brutos de trechos em lentidão (2022 e 2023)", len(bruto), "trechos"))
+    bruto["datetime"] = pd.to_datetime(bruto["data"], format="%d/%m/%Y %H:%M", errors="coerce")
+    bruto = bruto.dropna(subset=["datetime", "tamanho"])
+    linhas.append(("CET", "Com data e extensão válidas", len(bruto), "trechos"))
+    bruto = bruto[(bruto["datetime"] >= inicio) & (bruto["datetime"] <= fim)]
+    linhas.append(("CET", "No período", len(bruto), "trechos"))
+    linhas.append(("CET", "Instantâneos distintos (coletas de 30 min)", int(bruto["datetime"].nunique()), "instantâneos"))
+    lentidao = carregar_lentidao(caminhos_lentidao, inicio, fim)
+    linhas.append(("CET", "Horas da grade com lentidão definida (0 km se sem trecho)", int(lentidao["lentidao_disponivel"].sum()), "horas"))
+    sem_coleta = ~lentidao["lentidao_disponivel"]
+    linhas.append(("CET", "Horas em dias sem coleta (mantidas como NaN)", int(sem_coleta.sum()), "horas"))
+    linhas.append(("CET", "Dias sem coleta", int(lentidao.loc[sem_coleta, "datetime"].dt.normalize().nunique()), "dias"))
+
+    return pd.DataFrame(linhas, columns=["fonte", "etapa", "quantidade", "unidade"])
+
+
+def carregar_rastreabilidade(caminho: Path = RASTREABILIDADE_CSV) -> pd.DataFrame:
+    if not caminho.exists():
+        raise FileNotFoundError(f"{caminho} não existe. Execute `python -m src.preprocessing` primeiro.")
+    return pd.read_csv(caminho)
+
+
 def executar_pipeline(salvar: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Executa toda a Etapa 1 e (opcionalmente) grava os parquets processados.
 
@@ -561,6 +626,7 @@ def executar_pipeline(salvar: bool = True) -> tuple[pd.DataFrame, pd.DataFrame]:
         PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
         consolidado.to_parquet(CONSOLIDADO_PARQUET, index=False)
         horario.to_parquet(HORARIO_PARQUET, index=False)
+        resumir_rastreabilidade().to_csv(RASTREABILIDADE_CSV, index=False)
         logger.info("Gravado %s (%d linhas) e %s (%d linhas)", CONSOLIDADO_PARQUET.name, len(consolidado), HORARIO_PARQUET.name, len(horario))
     return consolidado, horario
 

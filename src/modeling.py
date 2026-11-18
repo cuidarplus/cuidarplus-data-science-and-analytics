@@ -86,6 +86,7 @@ class ResultadoModelo:
     metricas_teste: dict[str, Any] = field(default_factory=dict)
     metricas_temporal: dict[str, Any] = field(default_factory=dict)
     baseline_teste: dict[str, Any] = field(default_factory=dict)
+    baseline_temporal: dict[str, Any] = field(default_factory=dict)
     importancia_features: dict[str, float] = field(default_factory=dict)
     scale_pos_weight: float = 1.0
 
@@ -326,6 +327,9 @@ def treinar_classificador(X: pd.DataFrame, y: pd.Series) -> tuple[Pipeline, Resu
         resultado.metricas_temporal = _validacao_temporal(
             construir_classificador(scale_pos_weight=peso_positivo), X, y, anos, classificacao=True
         )
+        resultado.baseline_temporal = _validacao_temporal(
+            construir_classificador(baseline=True), X, y, anos, classificacao=True
+        )
     logger.info("Classificação - teste: %s", {k: v for k, v in resultado.metricas_teste.items() if k != "matriz_confusao"})
     return pipeline, resultado
 
@@ -375,6 +379,7 @@ def treinar_regressor(X: pd.DataFrame, y: pd.Series) -> tuple[Pipeline, Resultad
     )
     if anos is not None:
         resultado.metricas_temporal = _validacao_temporal(construir_regressor(), X, y, anos, classificacao=False)
+        resultado.baseline_temporal = _validacao_temporal(construir_regressor(baseline=True), X, y, anos, classificacao=False)
     logger.info("Regressão - teste: %s", resultado.metricas_teste)
     return pipeline, resultado
 
@@ -501,6 +506,7 @@ def main() -> None:
         print("Teste:", json.dumps(res.metricas_teste, ensure_ascii=False))
         print("Baseline:", json.dumps(res.baseline_teste, ensure_ascii=False))
         print("Temporal:", json.dumps(res.metricas_temporal, ensure_ascii=False))
+        print("Baseline temporal:", json.dumps(res.baseline_temporal, ensure_ascii=False))
         print("Top features:", list(res.importancia_features.items())[:8])
 
 
