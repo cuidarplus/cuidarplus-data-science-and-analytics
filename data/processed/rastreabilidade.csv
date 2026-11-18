@@ -1,0 +1,21 @@
+fonte,etapa,quantidade,unidade
+Infosiga,"Registros brutos (todos os municípios, 2022-2024)",598879,sinistros
+Infosiga,Município de SAO PAULO,136348,sinistros
+Infosiga,Com hora válida (HH:MM),136232,sinistros
+Infosiga,Com data e hora interpretáveis,136232,sinistros
+Infosiga,No período 2022-2023 (base final),90682,sinistros
+INMET,Observações brutas (todas as estações automáticas),72941866,observações
+INMET,Estação A701,169477,observações
+INMET,"No período, após conversão UTC para horário local",17313,observações
+INMET,Sem carimbos duplicados,17313,horas
+INMET,Horas da grade horária completa,17520,horas
+INMET,Horas ausentes na fonte,207,horas
+INMET,Horas ainda sem registro após imputar lacunas curtas,97,horas
+INMET,Horas com ao menos uma variável imputada,249,horas
+CET,Registros brutos de trechos em lentidão (2022 e 2023),313797,trechos
+CET,Com data e extensão válidas,313797,trechos
+CET,No período,313797,trechos
+CET,Instantâneos distintos (coletas de 30 min),19829,instantâneos
+CET,Horas da grade com lentidão definida (0 km se sem trecho),16128,horas
+CET,Horas em dias sem coleta (mantidas como NaN),1392,horas
+CET,Dias sem coleta,58,dias
