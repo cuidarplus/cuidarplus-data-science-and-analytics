@@ -1,5 +1,12 @@
 # Global Solution 2026-2 — Citizen Intelligence & Predictive Analytics
 
+## Integrantes
+
+| Nome | RM |
+|---|---|
+| José Ribeiro dos Santos Neto | 567692 |
+| Danilo Roberto Anterio dos Santos | 566966 |
+
 Impacto de fatores **climáticos** e **temporais** na severidade de sinistros de
 trânsito e na extensão de congestionamentos no município de **São Paulo**
 (2022–2023). Python local (macOS), sem Docker e sem ORM: toda a comunicação

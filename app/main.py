@@ -384,11 +384,21 @@ CSS_BASE = """
   section[data-testid="stSidebar"] .nota { font-size: 0.72rem !important; margin-top: 0.1rem; }
   .recorte { margin-bottom: 0.35rem; font-size: 0.74rem; color: var(--texto-3); line-height: 1.5; padding: 8px 10px; border: 1px dashed var(--linha); border-radius: 6px; }
   .recorte b { color: var(--texto); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .equipe { margin: 0.2rem 0 0.4rem; padding: 10px 12px; background: var(--card); border: 1px solid var(--linha); border-radius: 8px; }
+  .equipe .titulo { font-family: var(--fonte-display); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--texto-4); margin-bottom: 0.35rem; }
+  .equipe .membro { display: flex; flex-direction: column; gap: 1px; font-size: 0.78rem; color: var(--texto); line-height: 1.4; padding: 5px 0; }
+  .equipe .membro + .membro { border-top: 1px solid var(--linha-suave); }
+  .equipe .rm { font-family: var(--fonte-display); font-size: 0.66rem; color: var(--acento-texto); letter-spacing: 0.08em; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .rodape { margin-top: 1.4rem; padding-top: 0.8rem; border-top: 1px solid var(--linha-suave); font-family: var(--fonte-display); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--texto-4); line-height: 1.8; }
 
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 """
 st.markdown(f"<style>:root {{{TOKENS[TEMA]}}}{CSS_BASE}</style>", unsafe_allow_html=True)
+
+INTEGRANTES: list[tuple[str, str]] = [
+    ("José Ribeiro dos Santos Neto", "567692"),
+    ("Danilo Roberto Anterio dos Santos", "566966"),
+]
 
 ROTULO_SEVERIDADE = {"SEM_VITIMA": "Sem vítima", "COM_VITIMA": "Com vítima", "FATAL": "Fatal"}
 ROTULO_CHUVA = {"SEM_CHUVA": "Sem chuva", "FRACA": "Fraca (≤ 2,5 mm)", "MODERADA": "Moderada (≤ 10 mm)", "FORTE": "Forte (> 10 mm)"}
@@ -1392,6 +1402,8 @@ def barra_lateral(consolidado: pd.DataFrame, horario: pd.DataFrame, meta: dict[s
             '<div class="desc">Severidade de sinistros e lentidão sob fatores climáticos e temporais. Município de São Paulo, 2022–2023.</div></div>',
             unsafe_allow_html=True,
         )
+        membros = "".join(f'<div class="membro"><span>{nome}</span><span class="rm">RM {rm}</span></div>' for nome, rm in INTEGRANTES)
+        st.markdown(f'<div class="equipe"><div class="titulo">Integrantes</div>{membros}</div>', unsafe_allow_html=True)
 
         st.markdown("### Navegação")
         pagina = st.radio("Página", ["Painel analítico", "Documentação"], key="pagina", label_visibility="collapsed")
