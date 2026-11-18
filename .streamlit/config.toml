@@ -1,14 +1,39 @@
-# Tema fixo do dashboard: independe do modo claro/escuro do sistema operacional.
+# Tema fixo do dashboard (dark mode "telemetria"): independe do modo claro/escuro
+# do sistema operacional. Cobre os componentes nativos que o CSS não alcança
+# (dataframes em canvas, popovers de select/date, sliders). O acabamento fino
+# (cards, botões, tipografia) é feito pelo CSS injetado em app/main.py.
 [theme]
-base = "light"
-primaryColor = "#2f5597"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f3f4f6"
-textColor = "#1f2937"
-font = "sans serif"
+base = "dark"
+primaryColor = "#ff4f00"
+backgroundColor = "#0a0a0a"
+secondaryBackgroundColor = "#1a1a1a"
+textColor = "#e8eaed"
+linkColor = "#ff7a33"
+borderColor = "#26262a"
+showWidgetBorder = true
+baseRadius = "8px"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+headingFont = "Space Grotesk:https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"
+dataframeBorderColor = "#26262a"
+dataframeHeaderBackgroundColor = "#141416"
+# Deltas de st.metric: tons legíveis tanto no tema escuro quanto no claro (o tema é trocado por CSS).
+greenColor = "#16a34a"
+greenTextColor = "#16a34a"
+greenBackgroundColor = "rgba(22, 163, 74, 0.14)"
+redColor = "#dc2626"
+redTextColor = "#dc2626"
+redBackgroundColor = "rgba(220, 38, 38, 0.12)"
+
+[theme.sidebar]
+backgroundColor = "#0f0f11"
+secondaryBackgroundColor = "#18181b"
+borderColor = "#26262a"
 
 [browser]
 gatherUsageStats = false
 
 [server]
 headless = true
+
+[client]
+toolbarMode = "minimal"

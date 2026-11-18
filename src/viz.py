@@ -126,3 +126,105 @@ PLOTLY_LAYOUT_CORP: Final[dict] = {
     "legend": {"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0, "font": {"size": 11}},
     "hoverlabel": {"bgcolor": "#ffffff", "bordercolor": GRADE_CORP, "font": {"color": TEXTO_CORP, "size": 12, "family": "Inter, Helvetica, Arial, sans-serif"}},
 }
+
+
+# --------------------------------------------------------------------------- #
+# Paleta "telemetria" (dashboard em dark mode)
+# --------------------------------------------------------------------------- #
+# Fundo quase preto; dados em cores de alta luminância (laranja de sotaque,
+# magenta FIAP, violeta, âmbar). Eixos e rótulos em cinza médio (#888888)
+# para recuarem visualmente. A escala sequencial parte de um tom próximo ao
+# fundo (valores baixos "somem") e sobe por violeta -> magenta -> laranja ->
+# âmbar, monotônica em luminância.
+LARANJA: Final[str] = "#ff4f00"
+MAGENTA: Final[str] = "#ed145b"
+VIOLETA: Final[str] = "#a78bfa"
+AMBAR: Final[str] = "#ffb020"
+RACING: Final[list[str]] = [LARANJA, MAGENTA, VIOLETA, AMBAR]
+NEUTRO: Final[str] = "#71717a"
+NEUTRO_ESCURO: Final[str] = "#3f3f46"
+SEQUENCIAL_TELEMETRIA: Final[list[str]] = [
+    "#1c1b22", "#2d1b45", "#47196a", "#6a1878", "#921a74", "#bd1a63", "#e3274a", "#ff4f00", "#ff8a1f", "#ffc247",
+]
+COR_SEVERIDADE_DARK: Final[dict[str, str]] = {
+    "SEM_VITIMA": NEUTRO,
+    "COM_VITIMA": LARANJA,
+    "FATAL": MAGENTA,
+}
+COR_CHUVA_DARK: Final[dict[str, str]] = {
+    "SEM_CHUVA": NEUTRO_ESCURO,
+    "FRACA": "#7c3aed",
+    "MODERADA": MAGENTA,
+    "FORTE": LARANJA,
+}
+TEXTO_DARK: Final[str] = "#e8eaed"
+TEXTO_SEC_DARK: Final[str] = "#888888"
+GRADE_DARK: Final[str] = "#232326"
+
+PLOTLY_LAYOUT_DARK: Final[dict] = {
+    "template": "plotly_dark",
+    "paper_bgcolor": "rgba(0,0,0,0)",
+    "plot_bgcolor": "rgba(0,0,0,0)",
+    "font": {"family": "Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif", "color": TEXTO_SEC_DARK, "size": 12},
+    "colorway": RACING,
+    "margin": {"l": 48, "r": 16, "t": 52, "b": 40},
+    "title": {"font": {"family": "'Space Grotesk', Inter, sans-serif", "size": 14, "color": TEXTO_DARK}, "x": 0, "xanchor": "left"},
+    "xaxis": {"gridcolor": GRADE_DARK, "showline": False, "zeroline": False, "showgrid": False, "ticks": "",
+              "tickfont": {"color": TEXTO_SEC_DARK}, "title": {"font": {"color": TEXTO_SEC_DARK}}},
+    "yaxis": {"gridcolor": GRADE_DARK, "showline": False, "zeroline": False, "ticks": "",
+              "tickfont": {"color": TEXTO_SEC_DARK}, "title": {"font": {"color": TEXTO_SEC_DARK}}},
+    "legend": {"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0,
+               "font": {"size": 11, "color": TEXTO_SEC_DARK}, "bgcolor": "rgba(0,0,0,0)"},
+    "hoverlabel": {"bgcolor": "#141416", "bordercolor": LARANJA,
+                   "font": {"color": TEXTO_DARK, "size": 12, "family": "Inter, Helvetica, Arial, sans-serif"}},
+    "modebar": {"bgcolor": "rgba(0,0,0,0)", "color": "#52525b", "activecolor": LARANJA},
+}
+
+
+# --------------------------------------------------------------------------- #
+# Paleta "telemetria" (dashboard em light mode)
+# --------------------------------------------------------------------------- #
+# Mesma identidade (laranja de sotaque + magenta FIAP) sobre fundo off-white.
+# O laranja é escurecido para manter contraste sobre branco; a escala
+# sequencial inverte o sentido de luminância (claro = pouco, escuro = muito).
+LARANJA_CLARO_TEMA: Final[str] = "#e94800"
+MAGENTA_CLARO_TEMA: Final[str] = "#c8104f"
+RACING_CLARO: Final[list[str]] = [LARANJA_CLARO_TEMA, MAGENTA_CLARO_TEMA, "#7c3aed", "#b7791f"]
+SEQUENCIAL_TELEMETRIA_CLARO: Final[list[str]] = [
+    "#f6f4f8", "#ecdff2", "#ddc0e6", "#cb9bd8", "#b673c8", "#a14bb6", "#c0267f", "#b0124f", "#7d0b3a", "#4a0624",
+]
+TEXTO_LIGHT: Final[str] = "#111113"
+TEXTO_SEC_LIGHT: Final[str] = "#6b6b73"
+GRADE_LIGHT: Final[str] = "#e7e7ea"
+
+PLOTLY_LAYOUT_LIGHT: Final[dict] = {
+    **PLOTLY_LAYOUT_DARK,
+    "template": "plotly_white",
+    "font": {**PLOTLY_LAYOUT_DARK["font"], "color": TEXTO_SEC_LIGHT},
+    "colorway": RACING_CLARO,
+    "title": {**PLOTLY_LAYOUT_DARK["title"], "font": {**PLOTLY_LAYOUT_DARK["title"]["font"], "color": TEXTO_LIGHT}},
+    "xaxis": {**PLOTLY_LAYOUT_DARK["xaxis"], "gridcolor": GRADE_LIGHT, "tickfont": {"color": TEXTO_SEC_LIGHT}, "title": {"font": {"color": TEXTO_SEC_LIGHT}}},
+    "yaxis": {**PLOTLY_LAYOUT_DARK["yaxis"], "gridcolor": GRADE_LIGHT, "tickfont": {"color": TEXTO_SEC_LIGHT}, "title": {"font": {"color": TEXTO_SEC_LIGHT}}},
+    "legend": {**PLOTLY_LAYOUT_DARK["legend"], "font": {"size": 11, "color": TEXTO_SEC_LIGHT}},
+    "hoverlabel": {"bgcolor": "#ffffff", "bordercolor": LARANJA_CLARO_TEMA,
+                   "font": {"color": TEXTO_LIGHT, "size": 12, "family": "Inter, Helvetica, Arial, sans-serif"}},
+    "modebar": {"bgcolor": "rgba(0,0,0,0)", "color": "#a1a1aa", "activecolor": LARANJA_CLARO_TEMA},
+}
+
+# Tokens de gráfico por tema, consumidos pelo dashboard (app/main.py).
+PALETAS: Final[dict[str, dict]] = {
+    "escuro": {
+        "layout": PLOTLY_LAYOUT_DARK, "series": RACING, "neutro": NEUTRO, "neutro_escuro": NEUTRO_ESCURO,
+        "sequencial": SEQUENCIAL_TELEMETRIA, "severidade": COR_SEVERIDADE_DARK, "chuva": COR_CHUVA_DARK,
+        "texto": TEXTO_DARK, "texto_sec": TEXTO_SEC_DARK, "grade": GRADE_DARK,
+        "chuva_fundo": "rgba(167,139,250,0.22)", "faixa": "rgba(255,255,255,0.035)",
+    },
+    "claro": {
+        "layout": PLOTLY_LAYOUT_LIGHT, "series": RACING_CLARO, "neutro": "#8a8a93", "neutro_escuro": "#c4c4cc",
+        "sequencial": SEQUENCIAL_TELEMETRIA_CLARO,
+        "severidade": {"SEM_VITIMA": "#8a8a93", "COM_VITIMA": LARANJA_CLARO_TEMA, "FATAL": MAGENTA_CLARO_TEMA},
+        "chuva": {"SEM_CHUVA": "#d4d4d8", "FRACA": "#8b5cf6", "MODERADA": MAGENTA_CLARO_TEMA, "FORTE": LARANJA_CLARO_TEMA},
+        "texto": TEXTO_LIGHT, "texto_sec": TEXTO_SEC_LIGHT, "grade": GRADE_LIGHT,
+        "chuva_fundo": "rgba(124,58,237,0.14)", "faixa": "rgba(17,17,19,0.04)",
+    },
+}
